@@ -9,9 +9,10 @@
 
 #!/usr/bin/env bash
 
-HVM_IF=ens38 #packets on this iface in the vm would be punted to the docker
-D_SRC_DIR=/home/psg/working/MS/CMPE-209-SEC-01/project
-D_INST_DIR=/tmp/docker-suricata
+#packets on this iface in the vm would be punted to the docker
+HVM_IF=${HVM_IF:-ens38}
+D_SRC_DIR=${D_SRC_DIR:-/home/psg/working/MS/CMPE-209-SEC-01/project}
+D_INST_DIR=${D_INST_DIR:-/tmp/docker-suricata}
 D_MACVLAN_NET=mvlan4-net
 HOST_DOCKER_VBRDG_NAME=privnet
 D_CONT_NAME=mycontainer
