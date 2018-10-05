@@ -1,6 +1,11 @@
 # cmpe-209-project
 project-cmpe-209
 
+TL;DR
+
+Run like this 
+HVM_IF=ens4 D_SRC_DIR=$PWD D_CONT_NAME=clala-cont1 ./ztrustsec.sh -I
+HVM_IF=ens4 D_SRC_DIR=$PWD D_CONT_NAME=clala-cont1 ./ztrustsec.sh -n
 
 Files realted to CMPE209 major project
 
@@ -23,6 +28,3 @@ In this case we are using ens4 as the NIC inside the VM over which we will put m
 13. sudo docker stop mycontainer
 
 
-What's missing ?
-
-This will only create 2 interfaces inside the container. Still working on bridge creation config inside container.
