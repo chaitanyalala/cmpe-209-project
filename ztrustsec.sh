@@ -15,12 +15,12 @@ D_SRC_DIR=${D_SRC_DIR:-/home/psg/working/MS/CMPE-209-SEC-01/project}
 D_INST_DIR=${D_INST_DIR:-/tmp/docker-suricata}
 D_MACVLAN_NET=mvlan4-net
 HOST_DOCKER_VBRDG_NAME=privnet
-D_CONT_NAME=mycontainer
+D_CONT_NAME=${D_CONT_NAME:-mycontainer}
 ZS_TAG=ztrustsec
 ZS_CONT_IMG_ID=
 D_IFACE_CFG=docker_iface_configure.sh
 
-
+set +e
 
 # Usage info
 usage() {
@@ -73,7 +73,8 @@ create_docker_install_dir() {
     echo "... copied docker file from "$D_SRC_DIR" to "$D_INST_DIR
     cp $D_SRC_DIR/Dockerfile $D_INST_DIR 
     echo "... copied initial network configuration file from "$D_SRC_DIR" to "$D_INST_DIR
-    cp $D_SRC_DIR/docker_iface_configure.sh $D_INST_DIR
+    cp -f $D_SRC_DIR/docker_iface_configure.sh $D_INST_DIR/start.sh
+    chmod a+x $D_INST_DIR/start.sh
 }
 
 find_zsec_container_id() {
@@ -96,7 +97,7 @@ build_suricate_docker() {
     check_docker_installation
     if [ 0 -eq $? ]; then
         echo "...... building docker image for the ztrustsec"
-        echo "...... it could take about 10 mintes for this, as the image is needs to be build"
+        echo "...... it could take about 10 mintes for this, as the image is needs to be built"
 	sudo apt-get update
         time sudo docker build -t $ZS_TAG ./| tee $D_INST_DIR/log/install.log
     fi
@@ -110,8 +111,9 @@ install_suricata_docker () {
 }    
 
 zsec_start_docker() {
-    echo "... starting the docket container"
+    echo "... starting the docker container"
     sudo docker start $D_CONT_NAME
+    echo "... Attaching to the container"
     sudo docker exec -it $D_CONT_NAME bash ###TBD add the script here to configure the docker
     #sudo docker exec -it $D_CONT_NAME sh -c ./$D_IFACE_CFG
 
@@ -121,7 +123,7 @@ create_network_elem_vm() {
     echo ${FUNCNAME[0]}
     echo "... creating the network element in vm for ztrustsec"
     echo "... creating macvlan network on the docker"
-    sudo docker network create -d macvlan -o parent=$HVM_IF $D_MACVLAN_NET 2> $D_INST_DIR/log/error.log
+    sudo docker network create -d macvlan -o parent=$HVM_IF -o macvlan_mode=passthru $D_MACVLAN_NET 2> $D_INST_DIR/log/error.log
     if [ 0 -eq $? ]; then
         echo "...... created macvlan network on the docker"
     else
@@ -164,14 +166,15 @@ delete_docker_install_dir() {
             rm -rf $D_INST_DIR
     fi
 }
+
 delete_docker_img() {
     check_docker_installation
     if [ 0 -eq $? ]; then
-        echo "...... docker intsallation does not exists"
+        echo "...... docker installation does not exists"
         return 1
     fi
     echo "... removing docker image "$ZS_CONT_IMG_ID" forcefully"
-    sudo docker rm -f $ZS_CONT_IMG_ID
+    sudo docker rmi $ZS_CONT_IMG_ID --force
     sudo docker image ls
 }
 
@@ -179,12 +182,13 @@ uninstall_suricata_docker () {
     echo ${FUNCNAME[0]}
     delete_docker_img
     delete_docker_install_dir
-}    
+}
+
 delete_network_elem_vm() {
     echo ${FUNCNAME[0]}
     echo "... deleting the network element in vm for ztrustsec"
     echo "... stopping the docker container"
-    sudo docker stop mycontainer
+    sudo docker stop $D_CONT_NAME
     if [ 0 -eq $? ]; then
         echo "...... docker container "$ZS_CONT_IMG_ID "successfully stopped" 
     else
@@ -198,7 +202,7 @@ delete_network_elem_vm() {
         echo "...... docker container "$ZS_CONT_IMG_ID "already removed" 
     fi
     echo "... deleting macvlan network on the docker"
-    sudo docker network rm -d macvlan -o parent=$HVM_IF $D_MACVLAN_NET 2> $D_INST_DIR/log/error.log
+    sudo docker network rm $D_MACVLAN_NET 2> $D_INST_DIR/log/error.log
     if [ 0 -eq $? ]; then
         echo "...... deleted macvlan network on the docker"
     else
@@ -219,6 +223,7 @@ delete_network_elem_vm() {
         echo "... docker network " $D_CONT_NAME" with the virtual bridge "$HOST_DOCKER_VBRDG_NAME" on the vm is disconnected"
     fi
 }
+
 uninstall_docker_network () {
     echo ${FUNCNAME[0]}
     delete_network_elem_vm
@@ -299,3 +304,4 @@ shift $((OPTIND-1))
 #echo "... p = ${p}"
 #echo "... c = ${c}"
 
+set -e

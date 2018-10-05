@@ -16,4 +16,4 @@ brctl show
 ifconfig -a 
 ifconfig snoopbr 0
 ifconfig -a 
-ifconfig -a 
+/bin/bash

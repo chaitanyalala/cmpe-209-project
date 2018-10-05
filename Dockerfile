@@ -30,6 +30,7 @@ RUN \
   rm -rf /var/lib/apt/lists/*
 
 # Add files.
+COPY ./start.sh /root/start.sh
 
 # Set environment variables.
 ENV HOME /root
@@ -38,4 +39,7 @@ ENV HOME /root
 WORKDIR /root
 
 # Define default command.
-CMD ["bash"]
+#CMD ["bash"]
+
+# ENTRY PONIT
+ENTRYPOINT ["./start.sh"]
