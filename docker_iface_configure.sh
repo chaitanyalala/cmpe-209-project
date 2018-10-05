@@ -1,19 +1,12 @@
 #!/bin/bash
-
-ifconfig -a 
-ifconfig eth0 
 ifconfig eth0 0
-ifconfig eth0 
 ifconfig eth1 0
-ifconfig -a 
-ethtool -i eth0
-ethtool -i eth1
 brctl addbr snoopbr
 brctl snoopbr addif eth0
 brctl addif snoopbr eth0
 brctl addif snoopbr eth1
-brctl show 
-ifconfig -a 
 ifconfig snoopbr 0
-ifconfig -a 
+echo 'alert tcp any 5001 -> any any (msg:"iperf test";)' > /etc/suricata/rules/local.rules
+service suricata start
+# Don't let the script exit else it would cause the container to exit.
 /bin/bash
