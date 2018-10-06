@@ -1,30 +1,31 @@
-# cmpe-209-project
-project-cmpe-209
+#cmpe-209-project
+
 
 TL;DR
 
-Run like this 
-HVM_IF=ens4 D_SRC_DIR=$PWD D_CONT_NAME=clala-cont1 ./ztrustsec.sh -I
-HVM_IF=ens4 D_SRC_DIR=$PWD D_CONT_NAME=clala-cont1 ./ztrustsec.sh -n
+# Zero Trust Security Approach to Server Application
+## A containerized approach for IPS
 
-Files realted to CMPE209 major project
+###Abstract
+#### The evolution of cloud infrastructure has necessitated changes in traditional IDS/IPS for applications as well as policy management. This project aims to prototype a container based IDS/IPS for application deployed in VMs. The project intends to develop a working container which would perform IDS/IPS for any traffic to and from a VM. The project also intends to demonstrate a few test cases as how this security contianer would be used. The project intends to use
 
-How to use it ?
+ 1. docker containers
+ 2. suricata (https://suricata-ids.org/) as the IDS/IPS
+ 3. Linux namespace to keep the security module and applications in separate network domain.
 
-1. Create a Ubuntu VM with > 3 interfaces. One for SSH and 2 extra to pass into docker container
-2. Install Docker on it
-3. Create a work-dir on the VM (mkdir -p workdir; cp Dockerfile workdir/)
-4. Create a macvlan docker network -> 
-"sudo docker network  create -d macvlan -o parent=ens4 -o macvlan_mode=passthru ens4mvlan". 
-In this case we are using ens4 as the NIC inside the VM over which we will put macvlan. Do not use the same nic as the one being used for ssh.
-5. cd workdir
-6. sudo docker build ./
-7. Look at the image ID dumped by command in #6 -- say "2ae5c37d52f9"
-8. sudo docker network create privnet8 
-9. sudo docker create -it --privileged --net ens4mvlan --name privnet --name mycontainer 2ae5c37d52f9
-10. sudo docker network connect privnet mycontainer
-11. sudo docker start mycontainer
-12. sudo docker exec -it mycontainer bash
-13. sudo docker stop mycontainer
+
+# How to Run
+#####HVM_IF=ens4 D_SRC_DIR=$PWD D_CONT_NAME=<container-name> ./ztrustsec.sh -I
+#####HVM_IF=ens4 D_SRC_DIR=$PWD D_CONT_NAME=<container-name> ./ztrustsec.sh -n
+
+## Source Code
+*  ztrustsec.sh (The master script)
+*   docker_iface_configure.sh
+*   Dockerfile (ubuntu suricata docker File)
+*   http-server.py (demo simple and stupid http server in python using bottle)
+*   namespace.sh (an expriment script for network isolation using Namespace)
+
+
+
 
 
