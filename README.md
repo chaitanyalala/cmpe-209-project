@@ -14,9 +14,11 @@ TL;DR
  3. Linux namespace to keep the security module and applications in separate network domain.
 
 
-# How to Run
-#####HVM_IF=ens4 D_SRC_DIR=$PWD D_CONT_NAME=<container-name> ./ztrustsec.sh -I
-#####HVM_IF=ens4 D_SRC_DIR=$PWD D_CONT_NAME=<container-name> ./ztrustsec.sh -n
+## How to Run
+```
+HVM_IF=ens4 D_SRC_DIR=$PWD D_CONT_NAME=<container-name> ./ztrustsec.sh -I
+HVM_IF=ens4 D_SRC_DIR=$PWD D_CONT_NAME=<container-name> ./ztrustsec.sh -n
+```
 
 ## Source Code
 *  ztrustsec.sh (The master script)
